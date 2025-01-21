@@ -12,8 +12,8 @@ export const ChartComponents = () => {
   const [err, setError] = useState(null);
   const candleStickSeries = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const [tickerData, setData] = useState<any[]>([]); // Store the `data` array from the response
-  const [liveData, setLiveData] = useState<any[]>([]); // Store the live data after the kline data
-
+  const [lastUpdateTime, setLastUpdateTime] = useState<number | null>(null); // Track last update time
+  let socket: WebSocket;
   const fetchBTCData = async () => {
     try {
       const res = await fetch("http://localhost:8080/btc");
@@ -27,24 +27,12 @@ export const ChartComponents = () => {
     }
   };
 
-  const liveFetchingBTC = async () => {
-    try {
-      const res = await fetch("http://localhost:3000");
-      if (!res.ok) {
-        throw new Error("Network Response was not ok");
-      }
-      const response = await res.json();
-      setLiveData(response);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
   // Fetch Data
   useEffect(() => {
     fetchBTCData();
   }, []);
 
-  useEffect(() => {}, []);
+  // Fetch Live Data
 
   useEffect(() => {
     chart.current = createChart(chartContainerRef.current!);
@@ -99,7 +87,27 @@ export const ChartComponents = () => {
     }
   }, [tickerData]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    socket = new WebSocket("ws://localhost:3000");
+
+    socket.onmessage = (event: MessageEvent) => {
+      const parsedData = JSON.parse(event.data);
+
+      if (parsedData.confirm == true) {
+        candleStickSeries.current?.update(JSON.parse(event.data));
+      }
+    };
+
+    // Handle WebSocket connection close
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    // Clean up the WebSocket connection when the component unmounts
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   return (
     <div
