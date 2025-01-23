@@ -12,7 +12,6 @@ export const ChartComponents = () => {
   const [err, setError] = useState(null);
   const candleStickSeries = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const [tickerData, setData] = useState<any[]>([]); // Store the `data` array from the response
-  const [lastUpdateTime, setLastUpdateTime] = useState<number | null>(null); // Track last update time
   let socket: WebSocket;
   const fetchBTCData = async () => {
     try {
@@ -33,7 +32,6 @@ export const ChartComponents = () => {
   }, []);
 
   // Fetch Live Data
-
   useEffect(() => {
     chart.current = createChart(chartContainerRef.current!);
     // Add Chart Configurations
@@ -88,7 +86,7 @@ export const ChartComponents = () => {
   }, [tickerData]);
 
   useEffect(() => {
-    socket = new WebSocket("ws://localhost:3000");
+    socket = new WebSocket("ws://localhost:3000/live");
 
     socket.onmessage = (event: MessageEvent) => {
       const parsedData = JSON.parse(event.data);
