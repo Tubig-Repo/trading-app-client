@@ -5,6 +5,7 @@ import { ChartComponents } from "./ChartComponents";
 import { Home } from "./Home";
 import { Trade } from "./Trade";
 import { Routes, Route, Link } from "react-router-dom";
+
 function App() {
   return (
     <>

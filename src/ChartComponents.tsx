@@ -60,7 +60,7 @@ export const ChartComponents = () => {
       },
       timeScale: {
         borderColor: "#485c7b",
-      },
+      },``
       handleScroll: {
         mouseWheel: true,
         pressedMouseMove: true,
@@ -115,6 +115,8 @@ export const ChartComponents = () => {
       style={{
         marginLeft: "12px",
       }}
-    />
+    >
+      {err && <p style={{ color: "red" }}>Error: {err}</p>}
+    </div>
   );
 };
